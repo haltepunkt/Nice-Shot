@@ -11,8 +11,11 @@
     NSString *initializationPath;
     Initialization *ini;
     
+    IBOutlet NSMenuItem *resetToDefaultsMenuItem;
+    
 }
 
-- (IBAction)showGithubHelp:(id)sender;
+- (IBAction)resetToDefaults:(id)sender;
+- (IBAction)showHelp:(id)sender;
 
 @end

@@ -22,7 +22,17 @@
 }
 
 - (void)setBooleanValue:(id)sender {
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"setValueForName" object:@{@"name": [sender representedObject], @"value": [NSNumber numberWithLong:[sender state]]}];
+    NSNumber *value;
+    
+    if ([sender state] == NSOnState) {
+        value = @YES;
+    }
+    
+    else if ([sender state] == NSOffState) {
+        value = @NO;
+    }
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"setValueForName" object:@{@"name": [sender representedObject], @"value": value}];
 }
 
 - (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {

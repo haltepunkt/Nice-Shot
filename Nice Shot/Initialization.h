@@ -7,7 +7,18 @@
 }
 
 /**
- Returns an Initialization created by reading data from the file at a given path.
+ Creates and returns an Initialization containing the keys and values from another given dictionary
+
+ @param aDictionary A dictionary containing the keys and values with which to initialize the new Initialization.
+ 
+        Accepts only certains types of data: NSDictionary, NSString, and NSNumber.
+ 
+ @return An Initialization object.
+ */
+- (id)initWithDictionary:(NSDictionary *)aDictionary;
+
+/**
+ Creates and returns an Initialization created by reading data from the file at a given path.
 
  @param aPath A path to a file.
  @return An Initialization object.

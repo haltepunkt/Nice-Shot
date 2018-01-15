@@ -2,13 +2,39 @@
 
 @implementation Initialization
 
-- (id)initWithContentsOfFile:(NSString *)path {
+- (id)initWithDictionary:(NSDictionary *)aDictionary {
+     self = [super init];
+    
+    if (self) {
+        NSArray *types = @[[NSDictionary class], [NSString class], [NSNumber class]];
+        
+        for (NSObject *object in [dictionary allValues]) {
+            if (![types containsObject:[object class]]) {
+                return nil;
+            }
+            
+            if ([object isKindOfClass:[NSDictionary class]]) {
+                for (NSObject *child in [(NSDictionary *)object allValues]) {
+                    if (![[types subarrayWithRange:NSMakeRange(1, [types count] - 1)] containsObject:[child class]]) {
+                        return nil;
+                    }
+                }
+            }
+        }
+        
+        dictionary = [NSMutableDictionary dictionaryWithDictionary:aDictionary];
+    }
+    
+    return self;
+}
+
+- (id)initWithContentsOfFile:(NSString *)aPath {
     self = [super init];
     
     if (self) {
         dictionary = [NSMutableDictionary dictionary];
         
-        NSString *contents = [NSString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:NULL];
+        NSString *contents = [NSString stringWithContentsOfFile:aPath encoding:NSUTF8StringEncoding error:NULL];
         
         if (contents) {
             NSMutableDictionary *dict = [NSMutableDictionary dictionary];
@@ -46,12 +72,12 @@
     return self;
 }
 
-- (NSString *)nameForKey:(NSString *)key {
+- (NSString *)nameForKey:(NSString *)aKey {
     NSMutableString *name = [NSMutableString string];
     
-    for (NSUInteger idx = 0; idx < [key length]; idx++) {
-        if ([key characterAtIndex:idx] != '=') {
-            [name appendFormat:@"%c", [key characterAtIndex:idx]];
+    for (NSUInteger idx = 0; idx < [aKey length]; idx++) {
+        if ([aKey characterAtIndex:idx] != '=') {
+            [name appendFormat:@"%c", [aKey characterAtIndex:idx]];
         }
         
         else {
@@ -62,17 +88,17 @@
     return [NSString stringWithString:name];
 }
 
-- (NSObject *)valueForKey:(NSString *)key {
+- (NSObject *)valueForKey:(NSString *)aKey {
     NSMutableString *value = [NSMutableString string];
     
     BOOL d = NO;
     
-    for (NSUInteger idx = 0; idx < [key length]; idx++) {
+    for (NSUInteger idx = 0; idx < [aKey length]; idx++) {
         if (d) {
-            [value appendFormat:@"%c", [key characterAtIndex:idx]];
+            [value appendFormat:@"%c", [aKey characterAtIndex:idx]];
         }
         
-        if ([key characterAtIndex:idx] == '=' && d == 0) {
+        if ([aKey characterAtIndex:idx] == '=' && d == 0) {
             d = YES;
         }
     }
@@ -88,45 +114,45 @@
     return [NSString stringWithString:value];
 }
 
-- (NSObject *)valueForName:(NSString *)name section:(NSString *)section {
+- (NSObject *)valueForName:(NSString *)aName section:(NSString *)aSection {
     NSObject *value = NULL;
     
-    if (section) {
-        if ([dictionary objectForKey:section]) {
-            value = [[dictionary objectForKey:section] objectForKey:name];
+    if (aSection) {
+        if ([dictionary objectForKey:aSection]) {
+            value = [[dictionary objectForKey:aSection] objectForKey:aName];
         }
     }
     
     else {
-        value = [dictionary objectForKey:name];
+        value = [dictionary objectForKey:aName];
     }
     
     return value;
 }
 
-- (void)setValue:(NSObject *)value forName:(NSString *)name section:(NSString *)section {
-    if (section) {
-        if ([dictionary objectForKey:section]) {
-            [[dictionary objectForKey:section] setObject:value forKey:name];
+- (void)setValue:(NSObject *)aValue forName:(NSString *)aName section:(NSString *)aSection {
+    if (aSection) {
+        if ([dictionary objectForKey:aSection]) {
+            [[dictionary objectForKey:aSection] setObject:aValue forKey:aName];
         }
         
         else {
-            [dictionary setObject:[NSMutableDictionary dictionary] forKey:section];
+            [dictionary setObject:[NSMutableDictionary dictionary] forKey:aSection];
             
-            [[dictionary objectForKey:section] setObject:value forKey:name];
+            [[dictionary objectForKey:aSection] setObject:aValue forKey:aName];
         }
     }
     
     else {
-        [dictionary setObject:value forKey:name];
+        [dictionary setObject:aValue forKey:aName];
     }
 }
 
-- (BOOL)containsSection:(NSString *)section {
-    return [[dictionary allKeys] containsObject:section];
+- (BOOL)containsSection:(NSString *)aSection {
+    return [[dictionary allKeys] containsObject:aSection];
 }
 
-- (BOOL)writeToFile:(NSString *)path {
+- (BOOL)writeToFile:(NSString *)aPath {
     NSMutableString *initialization = [NSMutableString string];
     
     for (NSString *keyOrSection in [[dictionary allKeys] sortedArrayUsingSelector:@selector(compare:)]) {
@@ -147,20 +173,34 @@
         }
     }
     
-    return [initialization writeToFile:path atomically:YES encoding:NSUTF8StringEncoding error:NULL];
+    return [initialization writeToFile:aPath atomically:YES encoding:NSUTF8StringEncoding error:NULL];
 }
 
-- (NSString *)stringFromValue:(NSObject *)value {
-    if ([value isKindOfClass:[NSString class]]) {
-        return (NSString *)value;
+- (NSString *)stringFromValue:(NSObject *)aValue {
+    if ([aValue isKindOfClass:[NSString class]]) {
+        return (NSString *)aValue;
     }
     
-    else if ([value isEqual:@YES]) {
-        return @"true";
-    }
-    
-    else if ([value isEqual:@NO]) {
-        return @"false";
+   else if ([aValue isKindOfClass:[NSNumber class]]) {
+        if (!strcmp([(NSNumber *)aValue objCType], @encode(BOOL))) {
+            if ([aValue isEqual:@YES]) {
+                return @"true";
+            }
+            
+            else if ([aValue isEqual:@NO]) {
+                return @"false";
+            }
+        }
+        
+        CFNumberRef numberRef = (__bridge CFNumberRef)(NSNumber *)aValue;
+        
+        if (CFNumberIsFloatType(numberRef)) {
+            return [NSString stringWithFormat:@"%.6f", [(NSNumber *)aValue floatValue]];
+        }
+        
+        else if (CFNumberGetType(numberRef) == kCFNumberSInt32Type || CFNumberGetType(numberRef) == kCFNumberSInt64Type) {
+            return [NSString stringWithFormat:@"%i", [(NSNumber *)aValue intValue]];
+        }
     }
     
     return NULL;

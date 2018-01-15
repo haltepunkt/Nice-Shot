@@ -11,12 +11,12 @@
     
     if ([[NSFileManager defaultManager] fileExistsAtPath:initializationPath]) {
         if (![self openInitializationAtPath:initializationPath]) {
-            [self runAlert];
+            [self runAlertWithMessageText:@"Initialization could not be read!" informativeText:@"The “Mac-TASystemSettings.ini“ initialization file could not be read."];
         }
     }
     
     else {
-        [self runAlert];
+        [self runAlertWithMessageText:@"Initialization not found!" informativeText:@"Please locate the “Mac-TASystemSettings.ini“ initialization file."];
     }
 }
 
@@ -24,15 +24,56 @@
     return TRUE;
 }
 
-- (IBAction)showGithubHelp:(id)sender {
+- (IBAction)resetToDefaults:(id)sender {
+    NSAlert *alert = [NSAlert new];
+    
+    [alert setMessageText:@"Do you really want to reset the initialization to its defaults?"];
+    [alert setInformativeText:@"This action will move the “Mac-TASystemSettings.ini“ initialization file to the Trash. Rocket League will create a default initialization the next time it is launched."];
+    [alert addButtonWithTitle:@"Reset to Defaults"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSAlertStyleCritical];
+    
+    [alert beginSheetModalForWindow:window completionHandler:^(NSInteger result) {
+        if (result == NSAlertFirstButtonReturn) {
+            NSError *error;
+            
+            if ([[NSFileManager defaultManager] trashItemAtURL:[NSURL fileURLWithPath:initializationPath] resultingItemURL:NULL error:&error]) {
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"Data" object:NULL];
+                
+                [resetToDefaultsMenuItem setEnabled:NO];
+                
+                [window setTitle:@"Nice Shot"];
+                
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                    [self runAlertWithMessageText:@"Initialization not found!" informativeText:@"Please locate the “Mac-TASystemSettings.ini“ initialization file."];
+                });
+            }
+            
+            else {
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                    NSAlert *alert = [NSAlert new];
+                    
+                    [alert setMessageText:@"Could not move “Mac-TASystemSettings.ini“ to the Trash."];
+                    [alert setInformativeText:[error localizedDescription]];
+                    [alert addButtonWithTitle:@"Close"];
+                    [alert setAlertStyle:NSAlertStyleCritical];
+                    
+                    [alert beginSheetModalForWindow:window completionHandler:NULL];
+                });
+            }
+        }
+    }];
+}
+
+- (IBAction)showHelp:(id)sender {
     [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://github.com/haltepunkt/Nice-Shot"]];
 }
 
-- (void)runAlert {
+- (void)runAlertWithMessageText:(NSString *)messageText informativeText:(NSString *)informativeText {
     NSAlert *alert = [NSAlert new];
     
-    [alert setMessageText:@"Initialization not found!"];
-    [alert setInformativeText:@"Please locate the initialization file Mac-TASystemSettings.ini"];
+    [alert setMessageText:messageText];
+    [alert setInformativeText:informativeText];
     [alert addButtonWithTitle:@"Locate…"];
     [alert addButtonWithTitle:@"Quit"];
     [alert setAlertStyle:NSAlertStyleCritical];
@@ -52,17 +93,17 @@
                         initializationPath = path;
                         
                         if (![self openInitializationAtPath:initializationPath]) {
-                            [self runAlert];
+                            [self runAlertWithMessageText:@"Initialization could not be read!" informativeText:@"The “Mac-TASystemSettings.ini“ initialization file could not be read."];
                         }
                     }
                     
                     else {
-                        [self runAlert];
+                        [self runAlertWithMessageText:@"Wrong initialization file chosen!" informativeText:@"Please locate the “Mac-TASystemSettings.ini“ initialization file."];
                     }
                 }
                 
                 else {
-                    [self runAlert];
+                    [self runAlertWithMessageText:@"Initialization not found!" informativeText:@"Please locate the “Mac-TASystemSettings.ini“ initialization file."];
                 }
             }];
         }
@@ -113,6 +154,8 @@
             
             [window setTitle:[initializationPath stringByAbbreviatingWithTildeInPath]];
             
+            [resetToDefaultsMenuItem setEnabled:YES];
+            
             return TRUE;
         }
     }
@@ -122,7 +165,6 @@
 
 - (void)setValueForName:(NSNotification *)notification {
     NSString *name = [[notification object] objectForKey:@"name"];
-    
     NSObject *value = [[notification object] objectForKey:@"value"];
     
     [ini setValue:value forName:name section:@"SystemSettings"];
