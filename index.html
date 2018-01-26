@@ -4,116 +4,21 @@
 		<meta charset="UTF-8">
 		<meta name="keywords" content="rocket league, tweak, video settings, fps, frame rate, mac, macos, steam">
 		<title>Nice Shot - Tweak Rocket League's video settings on macOS</title>
-		<style>
-			body {
-				font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, sans-serif;
-				text-align: center;
-				margin: 0px;
-			}
-			div.stadium {
-				background: #4A4A4A;
-				background-image: url("Stadium-532.jpg");
-				background-repeat: no-repeat;
-			}
-			header {
-				width: 100%;
-			}
-			header.title {
-				height: 128px;	
-				font-size: 48px;
-				font-weight: bold;
-				color: #FFFFFF;
-				letter-spacing: 0px;
-				text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.50);
-				line-height: 128px;		
-			}
-			header.window {
-				height: auto;
-			}
-			img {
-				box-shadow: rgba(0, 0, 0, .45) 0 13px 15px;
-				max-width: 100%;
-				vertical-align: bottom;
-			}
-			section {
-				background: #FFFFFF;
-				padding-top: 32px;
-				z-index: 0;
-				position: relative;
-			}
-			section.title {
-				font-weight: bold;
-				font-size: 24px;
-			}
-			section.description {
-				color: #4A4A4A;
-				font-size: 18px;
-				line-height: 26px;
-				font-weight: 300;
-			}
-			div.button {
-				display: inline-block;
-				position: relative;
-			}
-			a.button {
-				color: white;
-				font-size: 19px;
-				text-align: center;
-				text-decoration: none;
-				border-radius: 5px;
-				padding: 8px 32px;
-				margin-left: 8px;
-				margin-right: 8px;
-				display: inline-block;
-				width: 96px;
-			}
-			a.button.download {
-				background-color: #3B99FC;
-			}
-			a.button.download:hover + div.button.download.tooltip {
-				display: block;
-			}
-			div.button.download.tooltip {
-				display: none;
-				font-size: 12px;
-				background: #F5F5F5;
-				padding: 8px;
-				position: absolute;
-				left: 0px;
-				top: -128px;
-				border: 1px solid #D6D6D6;
-				border-radius: 5px;
-			}
-			a.button.github {
-				background-color: #7ED321;
-			}
-			footer {
-				padding-top: 32px;
-				color: #4A4A4A;
-				font-size: 14px;
-			}
-			a {
-				color: #3B99FC;
-				text-decoration: none;
-			}
-		</style>
+		<link rel="stylesheet" type="text/css" href="stylesheet.css">
 	</head>
 	<body>
-		<div class="stadium">
-			<header class="title">Nice Shot</header>
-			<header class="window"><img src="Window.png"></header>
-		</div>
-		<section class="title">Tweak Rocket League's video settings on macOS.</section>
-		<section class="description">Finely tune video settings such as effects, shadows, draw distances or texture resolutions.<br>Improve frame rate and general performance to maximize your competitive advantage.</section>
-		<section>
+		<header>Nice Shot!<br><img src="Window.png"></header>
+		<div class="title">Tweak Rocket League's video settings on macOS.</div>
+		<div class="description">Finely tune video settings such as effects, shadows, draw distances or texture resolutions.<br>Improve frame rate and general performance to maximize your competitive advantage.</div>
+		<div class="buttons">
 			<div class="button">
 				<a href="https://github.com/haltepunkt/Nice-Shot/releases/download/v1.1/Nice-Shot-v1.1.zip" class="button download">Download</a>
-				<div class="button download tooltip"><b>Requirements:</b> macOS 10.10 or later.<br><br><b>Installation:</b> Unzip, control-click the app icon, then choose and click Open from the shortcut menu.</div>
+				<div class="button tooltip"><b>Requirements:</b> macOS 10.10 or later.<br><br><b>Installation:</b> Unzip, control-click the app icon, then choose and click Open from the shortcut menu.</div>
 			</div>
 			<div class="button">
 				<a href="https://github.com/haltepunkt/Nice-Shot" class="button github">GitHub</a>
 			</div>
-		</section>
-		<footer>Rocket League is a registered trademark of Psyonix, Inc. — <a href="https://www.rocketleague.com">https://www.rocketleague.com</a>
+		</div>
+		<footer>Rocket League is a registered trademark of Psyonix, Inc.<br><a href="https://www.rocketleague.com">https://www.rocketleague.com</a>
 	</body>
 </html>
